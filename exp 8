@@ -1,0 +1,34 @@
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import accuracy_score
+import numpy as np
+
+# Load the Iris dataset
+X, y = load_iris(return_X_y=True)
+
+# Convert to binary classification (Setosa vs Others)
+y_binary = (y == 0).astype(int)
+
+# Add noise to target values
+np.random.seed(42)
+y_noisy = y_binary + np.random.normal(scale=0.4, size=len(y_binary))
+
+# Split the dataset
+X_train, X_test, y_train, y_test = train_test_split(
+    X, (y_noisy >= 0.5).astype(int), test_size=0.2, random_state=42
+)
+
+# Train Linear Regression model
+linear_regression_model = LinearRegression()
+linear_regression_model.fit(X_train, y_train)
+
+# Make predictions
+y_pred = linear_regression_model.predict(X_test)
+
+# Convert predictions to binary values
+y_pred_binary = (y_pred >= 0.5).astype(int)
+
+# Calculate accuracy
+accuracy = accuracy_score(y_test, y_pred_binary) * 100
+print(f"Accuracy: {accuracy:.2f}%")
